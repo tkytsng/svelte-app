@@ -6,12 +6,12 @@ module.exports = {
   entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "./dist"),
-    filename: "main.js"
+    filename: "index.js"
   },
   plugins: [
     new HtmlWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: "css/mystyles.css"
+      filename: "asset/scss.bulma.css"
     })
   ],
   resolve: {
