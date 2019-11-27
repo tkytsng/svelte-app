@@ -1,13 +1,19 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
-  entry: "./src/index.js",
+  entry: "./src/index.ts",
   output: {
     path: path.resolve(__dirname, "./dist"),
-    filename: "index_bundle.js"
+    filename: "main.js"
   },
-  plugins: [new HtmlWebpackPlugin()],
+  plugins: [
+    new HtmlWebpackPlugin(),
+    new MiniCssExtractPlugin({
+      filename: "css/mystyles.css"
+    })
+  ],
   resolve: {
     // see below for an explanation
     alias: {
@@ -23,6 +29,21 @@ module.exports = {
         include: path.resolve(__dirname, "./src"),
         exclude: /node_modules/,
         use: "svelte-loader"
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader"
+          },
+          {
+            loader: "sass-loader",
+            options: {
+              sourceMap: true
+            }
+          }
+        ]
       }
     ]
   }
