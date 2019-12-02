@@ -130,7 +130,7 @@
     "trailing-comma": {
       "severity": "warning"
     },
-    "interface-name": false
+    "interface-name": [false]
   },
 
   "defaultSeverity": "error"

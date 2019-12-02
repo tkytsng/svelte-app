@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "types": ["@types/node"],
+    "types": ["node"],
     "paths": {
       "@/*": ["./*"],
       "~/*": ["./*"]

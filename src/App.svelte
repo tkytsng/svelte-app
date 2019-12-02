@@ -8,6 +8,9 @@
   let input1;
   let input2;
 
+  // let latitude = 0;
+  // let longitude = 0;
+
   const APIKEY_RECRUIT = process.env.APIKEY_RECRUIT;
   const APIKEY_GNAVI = process.env.APIKEY_GNAVI;
   const api_gnavi = `https://api.gnavi.co.jp/RestSearchAPI/v3/`;
@@ -16,6 +19,8 @@
 
   async function apitest() {
     const url = api_gnavi;
+    const location = await getLocation();
+    console.log(location);
 
     const params = {
       keyid: APIKEY_GNAVI,
@@ -44,11 +49,38 @@
   function getGnavi() {
     promise = apitest();
   }
+
+  async function getLocation() {
+    if (!navigator.geolocation) {
+      console.log(`!navigator.geolocation`);
+      return;
+    }
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        data => {
+          resolve({
+            latitude: data.coords.latitude,
+            longitude: data.coords.longitude
+          });
+        },
+        err => {
+          reject(null);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 2000
+        }
+      );
+    });
+  }
 </script>
 
 <!-- <input class="input" type="number" bind:value={input1} />
 <input type="number" bind:value={input2} /> -->
-<button class="button" on:click={getGnavi}>Bulma Button</button>
+<button class="button" on:click={getGnavi}>GNavi Button</button>
+<button class="button" on:click={getLocation}>getLocation Button</button>
 
 {#await promise}
   <p>...waiting</p>
@@ -56,8 +88,10 @@
   {#if data}
     <p>GNAVI returned</p>
     {#each data.rest as { name, address }, i}
-      <p>{name}</p>
-      <p>{address}</p>
+      <div class="box">
+        <!-- <p>{i}:{name}</p>
+        <p>{address}</p> -->
+      </div>
     {/each}
   {/if}
 {:catch error}
