@@ -21,11 +21,15 @@
     const url = api_gnavi;
     const location = await getLocation();
     console.log(location);
+    const latitude = location ? location.latitude : 0;
+    const longitude = location ? location.longitude : 0;
 
     const params = {
       keyid: APIKEY_GNAVI,
       freeword: "もつ鍋,モツ鍋",
-      freeword_condition: 2
+      freeword_condition: 2,
+      latitude: latitude,
+      longitude: longitude
     };
 
     const options = {
