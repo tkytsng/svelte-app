@@ -10,7 +10,7 @@
   const APIKEY_GNAVI = process.env.APIKEY_GNAVI;
   const api_gnavi = `https://api.gnavi.co.jp/RestSearchAPI/v3/`;
 
-  getMotsu();
+  const promise = getMotsu();
 
   async function getMotsu() {
     const url = api_gnavi;
@@ -38,16 +38,16 @@
     console.log(res.status);
 
     if (res.status === 200) {
-      // console.log(data);
-      // return data;
-      dispatch("motsu", {
-        data: data
-      });
+      console.log(data);
+      return data;
+      // dispatch("motsu", {
+      //   data: data
+      // });
     } else {
-      dispatch("motsu", {
-        data: new Error(data)
-      });
-      // throw new Error(data);
+      // dispatch("motsu", {
+      //   data: new Error(data)
+      // });
+      throw new Error(data);
     }
   }
 
@@ -78,17 +78,42 @@
   }
 </script>
 
-<!-- {#await promise}
-  <p>...waiting</p>
+<style lang="sass">
+  a.shop-desc {
+    color: inherit;
+    text-decoration: none;
+  }
+</style>
+
+{#await promise}
+  <div />
 {:then data}
   {#if data}
-    {#each data.rest as { name, address }, i}
+    {#each data.rest as { name, address, access, tel, url, image_url, pr, latitude, longitude }, i}
       <div class="box">
-        <p>{name}</p>
-        <p>{address}</p>
+        <article class="media">
+          <div class="media-left">
+            <figure class="image is-128x128">
+              <img src={image_url.shop_image1} alt="Image" />
+            </figure>
+          </div>
+          <div class="media-content">
+            <div class="content is-large">
+              <a href={url} class="shop-desc" target="_blank">
+                <p>
+                  <strong>{name}</strong>
+                </p>
+                <p>{pr.pr_short}</p>
+              </a>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query={name},{latitude},{longitude}"
+                target="_blank">
+                <small>{address}(Google Map)</small>
+              </a>
+            </div>
+          </div>
+        </article>
       </div>
     {/each}
   {/if}
-{:catch error}
-  <p style="color: red">{error.message}</p>
-{/await} -->
+{/await}
