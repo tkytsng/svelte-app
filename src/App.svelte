@@ -1,106 +1,62 @@
 <script lang="ts">
-  import axios from "axios";
-  axios.defaults.headers.post["Content-Type"] =
-    "application/x-www-form-urlencoded";
-
-  import SomeCompo from "./components/some-comp.svelte";
-  const message = "Hello World!";
-  let input1;
-  let input2;
-
-  // let latitude = 0;
-  // let longitude = 0;
-
-  const APIKEY_RECRUIT = process.env.APIKEY_RECRUIT;
-  const APIKEY_GNAVI = process.env.APIKEY_GNAVI;
-  const api_gnavi = `https://api.gnavi.co.jp/RestSearchAPI/v3/`;
+  import GetMotsu from "./components/GetMotsu.svelte";
 
   let promise;
-
-  async function apitest() {
-    const url = api_gnavi;
-    const location = await getLocation();
-    console.log(location);
-    const latitude = location ? location.latitude : 0;
-    const longitude = location ? location.longitude : 0;
-
-    const params = {
-      keyid: APIKEY_GNAVI,
-      freeword: "もつ鍋,モツ鍋",
-      freeword_condition: 2,
-      latitude: latitude,
-      longitude: longitude
-    };
-
-    const options = {
-      method: "get",
-      url: url,
-      params: params
-    };
-    // fetch(url, options)
-    const res = await axios(options);
-    const data = await res.data;
-    console.log(res.status);
-
-    if (res.status === 200) {
-      console.log(data);
-      return data;
-    } else {
-      throw new Error(data);
-    }
-  }
-
-  function getGnavi() {
-    promise = apitest();
-  }
-
-  async function getLocation() {
-    if (!navigator.geolocation) {
-      console.log(`!navigator.geolocation`);
-      return;
-    }
-
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        data => {
-          resolve({
-            latitude: data.coords.latitude,
-            longitude: data.coords.longitude
-          });
-        },
-        err => {
-          reject(null);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 8000,
-          maximumAge: 2000
-        }
-      );
-    });
+  function test(event) {
+    console.log(event.detail.data);
+    promise = event.detail.data;
   }
 </script>
 
+<style lang="sass">
+  a.shop-desc {
+    color: inherit;
+    text-decoration: none;
+  }
+</style>
+
 <!-- <input class="input" type="number" bind:value={input1} />
 <input type="number" bind:value={input2} /> -->
-<button class="button" on:click={getGnavi}>GNavi Button</button>
-<button class="button" on:click={getLocation}>getLocation Button</button>
+<!-- <button class="button" on:click={getGnavi}>Get Motsu</button> -->
+<!-- <button class="button" on:click={getLocation}>getLocation Button</button> -->
 
-{#await promise}
-  <p>...waiting</p>
-{:then data}
-  {#if data}
-    <p>GNAVI returned</p>
-    {#each data.rest as { name, address }, i}
-      <div class="box">
-        <!-- <p>{i}:{name}</p>
-        <p>{address}</p> -->
-      </div>
-    {/each}
-  {/if}
-{:catch error}
-  <p style="color: red">{error.message}</p>
-{/await}
+<GetMotsu on:motsu={test} />
 
-<!-- <div class:input1>{message}</div>
-<SomeCompo {input1} {input2} /> -->
+{#if promise}
+  {#each promise.rest as { name, address, access, tel, url, image_url, pr, latitude, longitude }, i}
+    <!-- <div class="box">
+      <p>{name}</p>
+      <p>{address}</p>
+      <p>{tel}</p>
+      <p>{url}</p>
+    </div> -->
+
+    <div class="box">
+      <article class="media">
+        <div class="media-left">
+          <figure class="image is-64x64">
+            <!-- <img src={image_url.shop_image1} alt="Image" /> -->
+          </figure>
+        </div>
+        <div class="media-content">
+          <div class="content">
+            <a href={url} class="shop-desc" target="_blank">
+              <p>
+                <strong>{name}</strong>
+                <br />
+                <small>{address}</small>
+
+              </p>
+              <p>{pr.pr_short}</p>
+            </a>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query={name},{latitude},{longitude}"
+              target="_blank">
+              Google Mapで開く
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  {/each}
+{/if}

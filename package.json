@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --mode development --watch --hot --content-base public",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "deploy": "firebase deploy --only hosting:where-is-motsunabe"
   },
   "devDependencies": {
     "@types/node": "^12.12.14",
