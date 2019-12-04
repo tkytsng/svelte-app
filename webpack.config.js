@@ -46,6 +46,14 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules|svelte\/src/,
+        loader: "ts-loader",
+        options: {
+          appendTsSuffixTo: [/\.svelte$/]
+        }
       }
     ]
   }
