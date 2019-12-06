@@ -1,8 +1,11 @@
-<script lang="ts">
+<script>
+  //@ts-check
   import axios from "axios";
   axios.defaults.headers.post["Content-Type"] =
     "application/x-www-form-urlencoded";
 
+  import MotsuBox from "./MotsuBox.svelte";
+  import MotsuCard from "./MotsuCard.svelte";
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
 
@@ -11,20 +14,25 @@
   const api_gnavi = `https://api.gnavi.co.jp/RestSearchAPI/v3/`;
 
   const promise = getMotsu();
+  let innnerwidth;
+  let Here = {
+    latitude: 35.6096,
+    longitude: 139.7283
+  };
 
   async function getMotsu() {
     const url = api_gnavi;
     const location = await getLocation();
     console.log(location);
-    const latitude = location ? location.latitude : 0;
-    const longitude = location ? location.longitude : 0;
+    Here.latitude = location ? location.latitude : 35;
+    Here.longitude = location ? location.longitude : 140;
 
     const params = {
       keyid: APIKEY_GNAVI,
       freeword: "もつ鍋,モツ鍋",
       freeword_condition: 2,
-      latitude: latitude,
-      longitude: longitude
+      latitude: Here.latitude,
+      longitude: Here.longitude
     };
 
     const options = {
@@ -76,44 +84,36 @@
       );
     });
   }
+
+  function getDistance(here, dest) {
+    const d = Math.sqrt(
+      (here.longitude - dest.longitude) *
+        Math.cos((here.latitude + dest.latitude) / 2) +
+        Math.pow(here.latitude - dest.latitude, 2)
+    );
+    console.log(Math.round(6370 * d));
+
+    return Math.round(6370 * d);
+  }
 </script>
 
-<style lang="sass">
-  a.shop-desc {
-    color: inherit;
-    text-decoration: none;
-  }
-</style>
+<svelte:window bind:innerWidth={innnerwidth} />
 
 {#await promise}
   <div />
 {:then data}
   {#if data}
-    {#each data.rest as { name, address, access, tel, url, image_url, pr, latitude, longitude }, i}
-      <div class="box">
-        <article class="media">
-          <div class="media-left">
-            <figure class="image is-128x128">
-              <img src={image_url.shop_image1} alt="Image" />
-            </figure>
-          </div>
-          <div class="media-content">
-            <div class="content is-large">
-              <a href={url} class="shop-desc" target="_blank">
-                <p>
-                  <strong>{name}</strong>
-                </p>
-                <p>{pr.pr_short}</p>
-              </a>
-              <a
-                href="https://www.google.com/maps/search/?api=1&query={name},{latitude},{longitude}"
-                target="_blank">
-                <small>{address}(Google Map)</small>
-              </a>
-            </div>
-          </div>
-        </article>
-      </div>
+    <!-- <p>innnerwidth is {innnerwidth}</p> -->
+    {#each data.rest as rest, i}
+      <!-- <MotsuCard {rest} /> -->
+      <MotsuBox
+        {rest}
+        distance={getDistance(Here, {
+          latitude: Number(rest.latitude),
+          longitude: Number(rest.longitude)
+        })} />
     {/each}
   {/if}
+{:catch}
+  <p>この辺りでもつ鍋を見つけることが出来ませんでした。</p>
 {/await}
